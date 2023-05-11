@@ -1,0 +1,148 @@
+package javajdbcdesktop;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import java.awt.Frame;
+import javax.swing.BoxLayout;
+import java.awt.BorderLayout;
+import javax.swing.JDesktopPane;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.DriverManager;
+
+
+
+public class Cruddemo {
+
+	Connection con;
+	Statement st;
+	CallableStatement cst;
+	ResultSet rs;
+
+	private JFrame frmMysqlCrudDemo;
+	private final JDesktopPane desktopPane = new JDesktopPane();
+	
+		
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Cruddemo window = new Cruddemo();
+					window.frmMysqlCrudDemo.setVisible(true);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+	}
+	
+	
+	public void connect() {
+		
+		try {
+			
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/pwcdb1","root","");
+			st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+			//JOptionPane.showMessageDialog(null, "Connection ok");
+			
+			
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.toString());
+		}
+		
+	}
+	
+	
+	public void disconnect() {
+		
+		try {
+			
+			st.close();
+			con.close();
+			//JOptionPane.showMessageDialog(null, "Disconnected");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.toString());
+			
+		}
+		
+	}
+	
+	
+	
+	
+	/**
+	 * Create the application.
+	 */
+	public Cruddemo() {
+		initialize();
+
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		
+		connect();
+				
+		frmMysqlCrudDemo = new JFrame();
+		frmMysqlCrudDemo.setExtendedState(Frame.MAXIMIZED_BOTH);
+		frmMysqlCrudDemo.setTitle("MySQL CRUD Demo");
+		frmMysqlCrudDemo.setBounds(100, 100, 1089, 500);
+		frmMysqlCrudDemo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmMysqlCrudDemo.getContentPane().setLayout(new BorderLayout(0, 0));
+		frmMysqlCrudDemo.getContentPane().add(desktopPane, BorderLayout.CENTER);
+		
+		JMenuBar menuBar = new JMenuBar();
+		frmMysqlCrudDemo.setJMenuBar(menuBar);
+		
+		JMenu mnNewMenu = new JMenu("Employee Records Management");
+		menuBar.add(mnNewMenu);
+		
+		JMenuItem mntmView = new JMenuItem("View and Update");
+		mntmView.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				intfView internalView = new intfView();
+				desktopPane.add(internalView);
+				internalView.setVisible(true);
+				
+			}
+		});
+		mnNewMenu.add(mntmView);
+		
+		JMenuItem mntmAdd = new JMenuItem("Add new record");
+		mntmAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				intfAdd internalAdd = new intfAdd();
+				desktopPane.add(internalAdd);
+				internalAdd.setVisible(true);
+				
+			}
+		});
+		mnNewMenu.add(mntmAdd);
+	
+		disconnect();
+		
+	} //end of initialize method
+
+
+
+} //class ends here
